@@ -1,8 +1,12 @@
 # HtmlAnalyzer
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/html_analyzer`. To experiment with that code, run `bin/console` for an interactive prompt.
+[https://www.w3.org/TR/wai-aria-1.1/](https://www.w3.org/TR/wai-aria-1.1/)
 
-TODO: Delete this and the text above, and describe your gem
+Local testing can be done with
+
+```
+irb -Ilib -rhtml_analyzer
+```
 
 ## Installation
 

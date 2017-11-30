@@ -1,11 +1,9 @@
 require "html_analyzer/version"
-
-require "nokogiri"
-require "open-uri"
+require "html_analyzer/html_page"
 
 module HtmlAnalyzer
 
   def self.analyze url
-    doc = Nokogiri::HTML(open(url))
+    HtmlPage.process(url)
   end
 end
