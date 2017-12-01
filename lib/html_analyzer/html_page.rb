@@ -1,27 +1,21 @@
 module HtmlAnalyzer
-
-  require "nokogiri"
-  require "open-uri"
-
   class HtmlPage
 
-    ##
-    # Initialize HtmlPage with given URL
-    #
+    attr_reader :navigations
+
     def initialize(url)
       @document = Nokogiri::HTML(
         open(url, "Accept-Language" => "en-US")
       )
+
+      elements = @document.css('nav', "[role='navigation']")
+      @navigations = elements.collect { |element| HtmlNavigation.new(element) }
     end
 
     def self.process(url)
       self.new(url)
     end
 
-    ##
-    # Check what ever the HTML page contains a footer
-    #
-    # @return [true] whenever when the HTML page have footer
     def footer?
       @document.css('footer', "[role='complementary']").any?
     end
@@ -35,15 +29,7 @@ module HtmlAnalyzer
     end
 
     def navigation?
-      @document.css('nav', "[role='navigation']").any?
-    end
-
-    def navigation
-      @document.css('nav', "[role='navigation']")
-    end
-
-    def extract_links from
-      Hash[from.css('a').map { |link| [link.text.strip, link["href"]] }]
+      @navigations.any?
     end
   end
 end
