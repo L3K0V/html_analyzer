@@ -2,7 +2,7 @@ module HtmlAnalyzer
 
   require_relative "with_links"
 
-  class HtmlNavigation < HtmlElement
+  class HtmlFooter < HtmlElement
     include WithLinks
   end
 

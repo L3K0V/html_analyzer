@@ -8,8 +8,9 @@ module HtmlAnalyzer
         open(url, "Accept-Language" => "en-US")
       )
 
-      elements = @document.css('nav', "[role='navigation']")
-      @navigations = elements.collect { |element| HtmlNavigation.new(element) }
+      @navigations = @document.css('nav', "[role='navigation']").collect { |element| HtmlNavigation.new(element) }
+
+      process_footer
     end
 
     def self.process(url)
@@ -17,7 +18,7 @@ module HtmlAnalyzer
     end
 
     def footer?
-      @document.css('footer', "[role='complementary']").any?
+      @footers.any?
     end
 
     def header?
@@ -30,6 +31,17 @@ module HtmlAnalyzer
 
     def navigation?
       @navigations.any?
+    end
+
+    def footers
+      @footers
+    end
+
+    private
+    def process_footer
+      elements = @document.css('footer', "[role='contentinfo']", "div#footer")
+      @footers = elements.reject { |element| element.ancestors.size > 10}
+                         .collect { |element| HtmlFooter.new(element)}
     end
   end
 end

@@ -1,6 +1,8 @@
 require "html_analyzer/version"
+require "html_analyzer/html_element"
 require "html_analyzer/html_page"
 require "html_analyzer/html_navigation"
+require "html_analyzer/html_footer"
 
 module HtmlAnalyzer
 
