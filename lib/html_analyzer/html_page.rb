@@ -4,12 +4,14 @@ module HtmlAnalyzer
     attr_reader :navigations
 
     def initialize(url)
+      @uri = URI.parse(url)
       @document = Nokogiri::HTML(
         open(url, "Accept-Language" => "en-US")
       )
 
-      @navigations = @document.css('nav', "[role='navigation']").collect { |element| HtmlNavigation.new(element) }
+      strip_page
 
+      process_navigation
       process_footer
     end
 
@@ -26,7 +28,7 @@ module HtmlAnalyzer
     end
 
     def main?
-      @document.css('main', "[role='main']").any?
+      @document.search('main', "[role='main']", '//div[starts-with(@class, "main")]').any?
     end
 
     def navigation?
@@ -39,9 +41,53 @@ module HtmlAnalyzer
 
     private
     def process_footer
-      elements = @document.css('footer', "[role='contentinfo']", "div#footer")
+
+      patterns = [
+        'footer', "[role='contentinfo']",
+        '//div[starts-with(@class, "footer")]', '//div[starts-with(@id, "footer")]'
+      ]
+
+      elements = @document.search(*patterns)
       @footers = elements.reject { |element| element.ancestors.size > 10}
                          .collect { |element| HtmlFooter.new(element)}
+    end
+
+    def process_navigation
+
+      patterns = [
+        'nav', "[role='navigation']",
+        '//div[starts-with(@class, "nav")]', '//div[starts-with(@id, "nav")]'
+      ]
+
+      elements = @document.search(*patterns)
+      @navigations = elements.collect { |element| HtmlNavigation.new(element) }
+    end
+
+    def strip_page
+
+      for_removal = [
+        'article', 'aside', 'audio',
+        'blockquote', 'br',
+        'canvas', 'code', '//comment()',
+        'figure', 'form', 'iframe',
+        'picture', 'textarea', 'script', 'noscript', 'img', 'p', 'table'
+      ]
+
+      @document.search(*for_removal).each { |node| node.remove }
+
+      directory_name = "tmp"
+      Dir.mkdir(directory_name) unless File.exists?(directory_name)
+
+      File.open("#{directory_name}/#{name}.html", "w") do |f|
+        f.write(@document.to_html)
+      end
+    end
+
+    def name
+      host = @uri.host
+      name = host.start_with?('www.') ? host[4..-1] : host
+      name = name.split('.')[0]
+      name
     end
   end
 end

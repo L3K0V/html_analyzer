@@ -8,7 +8,7 @@ RSpec.describe HtmlAnalyzer do
     end
 
     it "can detect header using role attribute 'banner' in a web page without a <header>" do
-      page = HtmlAnalyzer.analyze('https://en.wikipedia.org/wiki/Main_Page')
+      page = HtmlAnalyzer.analyze('https://wikipedia.org/wiki/Main_Page')
       expect(page.header?).to eq(true)
     end
 
@@ -34,6 +34,13 @@ RSpec.describe HtmlAnalyzer do
     it "can detect footer using <footer> tag in the web page" do
       page = HtmlAnalyzer.analyze('https://wildeisen.ch/')
       expect(page.footer?).to eq(true)
+    end
+  end
+
+  context "#main" do
+    it "can detect main using id main*" do
+      page = HtmlAnalyzer.analyze('http://www.telezueri.ch/')
+      expect(page.main?).to eq(true)
     end
   end
 end
