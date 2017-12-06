@@ -2,6 +2,7 @@ module HtmlAnalyzer
   class HtmlPage
 
     attr_reader :navigations
+    attr_reader :footers
 
     def initialize(url)
       @uri = URI.parse(url)
@@ -48,7 +49,7 @@ module HtmlAnalyzer
       ]
 
       elements = @document.search(*patterns)
-      @footers = elements.reject { |element| element.ancestors.size > 10}
+      @footers = elements.reject { |element| element.ancestors.size > 10 }
                          .collect { |element| HtmlFooter.new(element)}
     end
 

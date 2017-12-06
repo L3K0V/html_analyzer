@@ -24,7 +24,7 @@ RSpec.describe HtmlAnalyzer::HtmlNavigation, "using https://youtube.com" do
   end
 
   context "#extract_links" do
-    it "has a 11 entries on the first navigation" do # We need to filter extracting of all <a> based on criteria
+    it "has a 13 entries on the first navigation" do # We need to filter extracting of all <a> based on criteria
       expect(footers.first.extract_links.length).to be 13
     end
   end
