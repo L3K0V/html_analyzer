@@ -2,30 +2,30 @@ require 'spec_helper'
 
 RSpec.describe HtmlAnalyzer::HtmlNavigation, "using https://wildeisen.ch" do
   let(:webpage) { HtmlAnalyzer.analyze('https://wildeisen.ch/') }
-  let(:footers) { webpage.footers }
+  let(:footer) { webpage.footer }
 
-  it "has 1 footer found" do
-    expect(footers.length).to be 1
+  it "has a footer" do
+    expect(footer).to be
   end
 
   context "#extract_links" do
-    it "has a 52 entries on the first navigation" do # We need to filter extracting of all <a> based on criteria
-      expect(footers.first.extract_links.length).to be 52
+    it "has a 5 entries on the footer" do # We need to filter extracting of all <a> based on criteria
+      expect(footer.extract_links.length).to be 5
     end
   end
 end
 
 RSpec.describe HtmlAnalyzer::HtmlNavigation, "using https://youtube.com" do
   let(:webpage) { HtmlAnalyzer.analyze('https://youtube.com') }
-  let(:footers) { webpage.footers }
+  let(:footer) { webpage.footer }
 
   it "has 1 footer found" do
-    expect(footers.length).to be 1
+    expect(footer).to be
   end
 
   context "#extract_links" do
-    it "has a 13 entries on the first navigation" do # We need to filter extracting of all <a> based on criteria
-      expect(footers.first.extract_links.length).to be 13
+    it "has a 13 entries on the footer" do # We need to filter extracting of all <a> based on criteria
+      expect(footer.extract_links.length).to be 13
     end
   end
 end

@@ -1,8 +1,8 @@
 module HtmlAnalyzer
   class HtmlPage
 
-    attr_reader :navigations
-    attr_reader :footers
+    attr_reader :navigation
+    attr_reader :footer
 
     def initialize(url)
       @uri = URI.parse(url)
@@ -21,7 +21,11 @@ module HtmlAnalyzer
     end
 
     def footer?
-      @footers.any?
+      !@footer.nil?
+    end
+
+    def navigation?
+      !@navigation.nil?
     end
 
     def header?
@@ -32,14 +36,6 @@ module HtmlAnalyzer
       @document.search('main', "[role='main']", '//div[starts-with(@class, "main")]').any?
     end
 
-    def navigation?
-      @navigations.any?
-    end
-
-    def footers
-      @footers
-    end
-
     private
     def process_footer
 
@@ -48,9 +44,8 @@ module HtmlAnalyzer
         '//div[starts-with(@class, "footer")]', '//div[starts-with(@id, "footer")]'
       ]
 
-      elements = @document.search(*patterns)
-      @footers = elements.reject { |element| element.ancestors.size > 10 }
-                         .collect { |element| HtmlFooter.new(element)}
+      elements = @document.search(*patterns).sort_by { |e| e.ancestors.size }
+      @footer = HtmlFooter.new(elements.first)
     end
 
     def process_navigation
@@ -61,7 +56,10 @@ module HtmlAnalyzer
       ]
 
       elements = @document.search(*patterns)
-      @navigations = elements.collect { |element| HtmlNavigation.new(element) }
+                          .reject {|e| e.attributes['class'].value.include? 'footer' if e.attributes['class']}
+                          .sort_by { |e| e.ancestors.size}
+
+      @navigation = HtmlNavigation.new(elements.first)
     end
 
     def strip_page

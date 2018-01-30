@@ -1,16 +1,17 @@
 require 'spec_helper'
+require 'pp'
 
 RSpec.describe HtmlAnalyzer::HtmlNavigation, "using https://wildeisen.ch" do
   let(:webpage) { HtmlAnalyzer.analyze('https://wildeisen.ch/') }
-  let(:navigations) { webpage.navigations }
+  let(:navigation) { webpage.navigation }
 
-  it "has 3 navigations found" do
-    expect(navigations.length).to be 3
+  it "has navigations" do
+    expect(navigation).to be
   end
 
   context "#extract_links" do
-    it "has a 3 entries on the first navigation" do
-      expect(navigations.first.extract_links.length).to be 6
+    it "has a 6 entries on the main navigation" do
+      expect(navigation.extract_links.length).to be 6
     end
   end
 end
