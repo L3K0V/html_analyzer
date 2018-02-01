@@ -1,6 +1,7 @@
 module HtmlAnalyzer
   class HtmlPage
 
+    attr_reader :header
     attr_reader :navigation
     attr_reader :footer
 
@@ -12,6 +13,7 @@ module HtmlAnalyzer
 
       strip_page
 
+      process_header
       process_navigation
       process_footer
     end
@@ -29,7 +31,7 @@ module HtmlAnalyzer
     end
 
     def header?
-      @document.css('header', "[role='banner']").any?
+      !@header.nil?
     end
 
     def main?
@@ -37,29 +39,24 @@ module HtmlAnalyzer
     end
 
     private
-    def process_footer
-
-      patterns = [
-        'footer', "[role='contentinfo']",
-        '//div[starts-with(@class, "footer")]', '//div[starts-with(@id, "footer")]'
-      ]
-
-      elements = @document.search(*patterns).sort_by { |e| e.ancestors.size }
-      @footer = HtmlFooter.new(elements.first)
+    def process_header
+      elements = @document.css('header', "[role='banner']")
+      @header = HtmlHeader.new(elements.first) if elements.any?
     end
 
     def process_navigation
-
-      patterns = [
-        'nav', "[role='navigation']",
-        '//div[starts-with(@class, "nav")]', '//div[starts-with(@id, "nav")]'
-      ]
-
-      elements = @document.search(*patterns)
+      # Seach elements with given patterns but reject these who class incude footer.
+      # This way if there are more outer <nav> tag with a footer class will be exluded
+      elements = @document.search_navigation
                           .reject {|e| e.attributes['class'].value.include? 'footer' if e.attributes['class']}
                           .sort_by { |e| e.ancestors.size}
 
-      @navigation = HtmlNavigation.new(elements.first)
+      @navigation = HtmlNavigation.new(elements.first) if elements.any?
+    end
+
+    def process_footer
+      elements = @document.search_footer.sort_by { |e| e.ancestors.size }
+      @footer = HtmlFooter.new(elements.first) if elements.any?
     end
 
     def strip_page
