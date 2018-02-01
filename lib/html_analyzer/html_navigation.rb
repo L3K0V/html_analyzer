@@ -1,9 +1,9 @@
 module HtmlAnalyzer
 
-  require_relative "with_links"
-
   class HtmlNavigation < HtmlElement
-    include WithLinks
+    def initialize(element)
+      super(element)
+    end
   end
 
 end

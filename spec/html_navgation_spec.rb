@@ -11,7 +11,7 @@ RSpec.describe HtmlAnalyzer::HtmlNavigation, "using https://wildeisen.ch" do
 
   context "#extract_links" do
     it "has a 6 entries on the main navigation" do
-      expect(navigation.extract_links.length).to be 6
+      expect(navigation.links.length).to be 6
     end
   end
 end

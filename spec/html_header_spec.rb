@@ -20,7 +20,7 @@ RSpec.describe HtmlAnalyzer::HtmlHeader, "using https://www.telezueri.ch/" do
 
   context "#extract_links" do
     it "has a 4 entries on the header navigation" do
-      expect(navigation.extract_links.length).to be 4
+      expect(navigation.links.length).to be 4
     end
   end
 end
@@ -44,7 +44,7 @@ RSpec.describe HtmlAnalyzer::HtmlHeader, "using https://stackoverflow.com/" do
 
   context "#extract_links" do
     it "has a 4 entries on the first header navigation" do
-      expect(navigation.extract_links.length).to be 4
+      expect(navigation.links.length).to be 4
     end
   end
 end
