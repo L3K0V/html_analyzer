@@ -25,15 +25,21 @@ page = HtmlAnalyzer.analyze('https://github.com/')
 
 page.header?
 => true
+page.header.probability
+=> 0.25
 
 page.header.navigation?
 => true
 
 page.footer?
 => true
+page.footer.probability
+=> 0.4
 
 page.navigation?
 => true
+page.navigation.probability
+=> 0.6
 ```
 
 ## Development

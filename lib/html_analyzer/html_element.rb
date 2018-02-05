@@ -28,13 +28,6 @@ module HtmlAnalyzer
       @links.each_with_object(Hash.new(0)) { |link, counts| counts[link.depth] += 1 }.sort_by {|k, v| v}.reverse
     end
 
-    protected
-    def extract_links element
-      element.search('a')
-             .reject { |e| e.text.strip.empty? }
-             .collect { |e| HtmlAnalyzer::HtmlLink.new(e) }
-    end
-
     def probability
       coef = 0.0
       coef += 0.35 if @type == 'nav'
@@ -45,12 +38,12 @@ module HtmlAnalyzer
 
       if @classes
         @classes.each do |clss|
-          if clss.match(Regexp.union(NAV_LITERALS))
+          if clss.downcase.match(Regexp.union(NAV_LITERALS))
             coef += 0.45
             break
           end
 
-          if clss.match(Regexp.union(OTHER_LITERALS))
+          if clss.downcase.match(Regexp.union(OTHER_LITERALS))
             coef += 0.10
             break
           end
@@ -58,6 +51,13 @@ module HtmlAnalyzer
       end
 
       coef
+    end
+
+    protected
+    def extract_links element
+      element.search('a')
+             .reject { |e| e.text.strip.empty? }
+             .collect { |e| HtmlAnalyzer::HtmlLink.new(e) }
     end
 
     private
