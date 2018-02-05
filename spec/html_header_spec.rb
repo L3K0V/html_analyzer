@@ -18,6 +18,10 @@ RSpec.describe HtmlAnalyzer::HtmlHeader, "using https://www.telezueri.ch/" do
     expect(header.navigations.size).to be 1
   end
 
+  it "navigation has probability equal or more than 0.6" do
+    expect(header.navigations.first.probability).to be >= 0.6
+  end
+
   context "#extract_links" do
     it "has a 4 entries on the header navigation" do
       expect(navigation.links.length).to be 4
@@ -40,6 +44,11 @@ RSpec.describe HtmlAnalyzer::HtmlHeader, "using https://stackoverflow.com/" do
 
   it "has only 2 navigations in header" do
     expect(header.navigations.size).to be 2
+  end
+
+  it "navigations has probability equal or more than 0.6" do
+    expect(header.navigations.first.probability).to be >= 0.6
+    expect(header.navigations.last.probability).to be >= 0.6
   end
 
   context "#extract_links" do

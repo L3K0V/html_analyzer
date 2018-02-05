@@ -22,11 +22,13 @@ RSpec.describe HtmlAnalyzer do
     it "can detect navigation using a 'nav' tag in a webpage with a <nav>" do
       page = HtmlAnalyzer.analyze('https://wildeisen.ch/')
       expect(page.navigation?).to be
+      expect(page.navigation.probability).to be > 0.5
     end
 
     it "can detect navigation using role attribute eq 'navigation' in webpage without a <nav>" do
       page = HtmlAnalyzer.analyze('https://youtube.com/')
       expect(page.navigation?).to be
+      expect(page.navigation.probability).to be > 0.5
     end
   end
 
