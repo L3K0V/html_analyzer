@@ -2,12 +2,6 @@
 
 [https://www.w3.org/TR/wai-aria-1.1/](https://www.w3.org/TR/wai-aria-1.1/)
 
-Local testing can be done with
-
-```
-irb -Ilib -rhtml_analyzer
-```
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -26,7 +20,21 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+page = HtmlAnalyzer.analyze('https://github.com/')
+
+page.header?
+=> true
+
+page.header.navigation?
+=> true
+
+page.footer?
+=> true
+
+page.navigation?
+=> true
+```
 
 ## Development
 
