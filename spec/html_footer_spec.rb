@@ -9,8 +9,8 @@ RSpec.describe HtmlAnalyzer::HtmlNavigation, "using https://wildeisen.ch" do
   end
 
   context "#extract_links" do
-    it "has a 5 entries on the footer" do # We need to filter extracting of all <a> based on criteria
-      expect(footer.links.length).to be 5
+    it "has a 51 entries on the footer" do # We need to filter extracting of all <a> based on criteria
+      expect(footer.links.length).to be 51
     end
   end
 end
