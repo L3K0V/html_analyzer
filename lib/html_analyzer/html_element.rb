@@ -34,5 +34,34 @@ module HtmlAnalyzer
              .reject { |e| e.text.strip.empty? }
              .collect { |e| HtmlAnalyzer::HtmlLink.new(e) }
     end
+
+    def probability
+      coef = 0.0
+      coef += 0.35 if @type == 'nav'
+      coef += 0.15 if @type == 'div'
+      coef += 0.75 if @role == 'navigation'
+      coef += 0.10 if self.links?
+      coef += 0.15 if self.links? && self.links.size / 2 <= self.links_by_depth.first[1]
+
+      if @classes
+        @classes.each do |clss|
+          if clss.match(Regexp.union(NAV_LITERALS))
+            coef += 0.45
+            break
+          end
+
+          if clss.match(Regexp.union(OTHER_LITERALS))
+            coef += 0.10
+            break
+          end
+        end
+      end
+
+      coef
+    end
+
+    private
+    NAV_LITERALS = ["nav", "navigation"]
+    OTHER_LITERALS = ["menu", "main"]
   end
 end
