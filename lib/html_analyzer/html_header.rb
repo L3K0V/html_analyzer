@@ -6,7 +6,9 @@ module HtmlAnalyzer
     def initialize(element)
       super(element)
       elements = element.search_navigation
-      @navigations = elements.collect { |el| HtmlNavigation.new(el) }
+                          .reject {|e| e.attributes['class'].value.include? 'footer' if e.attributes['class']}
+                          .sort_by { |e| e.ancestors.size}
+      @navigations = elements.collect { |el| HtmlNavigation.new(el) } if elements.any?
     end
 
     def navigation?

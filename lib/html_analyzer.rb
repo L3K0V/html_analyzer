@@ -5,6 +5,8 @@ require "html_analyzer/html_page"
 require "html_analyzer/html_header"
 require "html_analyzer/html_navigation"
 require "html_analyzer/html_footer"
+require "html_analyzer/html_spider"
+
 
 module HtmlAnalyzer
 
@@ -14,5 +16,9 @@ module HtmlAnalyzer
 
   def self.analyze url
     HtmlPage.process(url)
+  end
+
+  def self.gather
+    HtmlSpider.new
   end
 end

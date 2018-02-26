@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+
+require 'csv'
+require "bundler/setup"
+require "html_analyzer"
+
+gather = HtmlAnalyzer.gather
+gather.enqueue 'https://www.culturata.com/'
+gather.enqueue 'https://www.wildeisen.ch/'
+gather.enqueue 'https://www.wireltern.ch/'
+gather.enqueue 'https://github.com/'
+gather.enqueue 'https://stackoverflow.com/'
+gather.enqueue 'https://www.youtube.com/'
+gather.enqueue 'http://www.datecs.bg/'
+gather.enqueue 'https://www.ebay.com/'
+gather.enqueue 'https://www.amazon.com/'
+gather.enqueue 'https://www.bignerdranch.com/'
+gather.enqueue 'http://kolibriframework.io/'
+gather.enqueue 'https://www.microsoft.com'
+gather.enqueue 'https://squareup.com'
+gather.enqueue 'https://www.apple.com/'
+gather.enqueue 'https://www.reddit.com/'
+gather.enqueue 'https://www.bing.com/'
+gather.enqueue 'https://www.aliexpress.com/'
+gather.enqueue 'https://www.nzz.ch/'
+
+Dir.chdir(".") do
+  CSV.open("./linear-regression-input.csv", "wb") do |csv|
+
+    csv << ['url', 'tag', 'class', 'id', 'role', 'depth', 'links', 'links_by_depth', 'probability']
+
+    gather.results.each { |r|
+      r['elements'].each { |e|
+        
+        if e['element'].nil? || e['element'].empty?
+          next
+        end
+
+        data = []
+        data << r['url']
+        data += e['element'].split(',')
+        data << e['probability']
+
+        csv << data
+        csv.flush
+      }
+    }
+  end
+end

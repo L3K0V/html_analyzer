@@ -4,12 +4,15 @@ module HtmlAnalyzer
     attr_reader :header
     attr_reader :navigation
     attr_reader :footer
+    attr_reader :elements
 
     def initialize(url)
       @uri = URI.parse(url)
       @document = Nokogiri::HTML(
         open(url, "Accept-Language" => "en-US")
       )
+
+      @elements = @document.search('div', 'main', 'footer', 'nav').collect { |el| HtmlElement.new(el) }
 
       strip_page
 
@@ -37,6 +40,18 @@ module HtmlAnalyzer
     def main?
       @document.search('main', "[role='main']", '//div[starts-with(@class, "main")]').any?
     end
+    
+    def navigation_in_header?
+      persist = self.header? && self.navigation? && self.header.navigation?
+
+      if persist
+        persist = persist && self.header.navigations.select { |nav|
+          self.navigation.get_model == nav.get_model
+        }.any?
+      end
+
+      persist
+    end
 
     private
     def process_header
@@ -47,8 +62,11 @@ module HtmlAnalyzer
     def process_navigation
       # Seach elements with given patterns but reject these who class incude footer.
       # This way if there are more outer <nav> tag with a footer class will be exluded
+      # Also we reject navs with shifter class because this is injected by jquery mobile nav.
+      # We do not want to be confused by duplicated navs.
       elements = @document.search_navigation
                           .reject {|e| e.attributes['class'].value.include? 'footer' if e.attributes['class']}
+                          .reject {|e| e.attributes['class'].value.include? 'shifter' if e.attributes['class']}
                           .sort_by { |e| e.ancestors.size}
 
       @navigation = HtmlNavigation.new(elements.first) if elements.any?

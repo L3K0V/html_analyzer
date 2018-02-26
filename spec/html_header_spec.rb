@@ -19,7 +19,7 @@ RSpec.describe HtmlAnalyzer::HtmlHeader, "using https://www.telezueri.ch/" do
   end
 
   it "navigation has probability equal or more than 0.6" do
-    expect(header.navigations.first.probability).to be >= 0.6
+    expect(header.navigations.first.is_element?).to be
   end
 
   context "#extract_links" do
@@ -47,8 +47,8 @@ RSpec.describe HtmlAnalyzer::HtmlHeader, "using https://stackoverflow.com/" do
   end
 
   it "navigations has probability equal or more than 0.6" do
-    expect(header.navigations.first.probability).to be >= 0.6
-    expect(header.navigations.last.probability).to be >= 0.6
+    expect(header.navigations.first.is_element?).to be
+    expect(header.navigations.last.is_element?).to be
   end
 
   context "#extract_links" do
