@@ -47,10 +47,11 @@ module HtmlAnalyzer
             ]
           }
 
-          page.elements.each do |node|
+          page.document.search('div', 'main', 'footer', 'nav').each do |node|
+            element = HtmlElement.new(node)
             data["elements"].push({
-                "element" => node.get_model,
-                "probability" => node.get_probability
+                "element" => element.get_model,
+                "probability" => element.get_probability
             })
           end
 

@@ -4,7 +4,7 @@ module HtmlAnalyzer
     attr_reader :header
     attr_reader :navigation
     attr_reader :footer
-    attr_reader :elements
+    attr_reader :document
 
     def initialize(url)
       @uri = URI.parse(url)
@@ -14,11 +14,29 @@ module HtmlAnalyzer
 
       @elements = @document.search('div', 'main', 'footer', 'nav').collect { |el| HtmlElement.new(el) }
 
-      strip_page
+      # strip_page
 
       process_header
       process_navigation
       process_footer
+    end
+
+    def self.modify(url)
+      page = self.new(url)
+
+      navigation = page.document.search_navigation
+                                .reject {|e| e.attributes['class'].value.include? 'footer' if e.attributes['class']}
+                                .reject {|e| e.attributes['class'].value.include? 'shifter' if e.attributes['class']}
+                                .sort_by { |e| e.ancestors.size}
+      navigation.first.remove if navigation.any?
+
+      header = page.document.css('header', "[role='banner']").sort_by { |e| e.ancestors.size}
+      header.first.remove if header.any?
+
+      footer = page.document.search_footer.sort_by { |e| e.ancestors.size }
+      footer.first.remove if footer.any?
+
+      page.document.to_html
     end
 
     def self.process(url)
@@ -40,7 +58,7 @@ module HtmlAnalyzer
     def main?
       @document.search('main', "[role='main']", '//div[starts-with(@class, "main")]').any?
     end
-    
+
     def navigation_in_header?
       persist = self.header? && self.navigation? && self.header.navigation?
 

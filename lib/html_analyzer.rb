@@ -18,6 +18,10 @@ module HtmlAnalyzer
     HtmlPage.process(url)
   end
 
+  def self.modify url
+    HtmlPage.modify(url)
+  end
+
   def self.gather
     HtmlSpider.new
   end
