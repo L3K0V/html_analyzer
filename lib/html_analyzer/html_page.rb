@@ -30,7 +30,19 @@ module HtmlAnalyzer
                                 .sort_by { |e| e.ancestors.size}
       navigation.first.remove if navigation.any?
 
-      header = page.document.css('header', "[role='banner']").sort_by { |e| e.ancestors.size}
+      header = page.document.css('header', "[role='banner']")
+                            .reject {|e| e.attributes['class'].value.include? 'section' if e.attributes['class']}
+                            .sort_by { |e| e.ancestors.size}
+
+      header.first.ancestors.each { |el|
+        next if !el.element?
+
+        if el.attributes['class'] && el.attributes['class'].value.downcase.include?('nav')
+          el.remove
+          break
+        end
+      }
+
       header.first.remove if header.any?
 
       footer = page.document.search_footer.sort_by { |e| e.ancestors.size }
