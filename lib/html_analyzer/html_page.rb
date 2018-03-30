@@ -1,15 +1,11 @@
 module HtmlAnalyzer
   class HtmlPage
-
-    attr_reader :header
-    attr_reader :navigation
-    attr_reader :footer
-    attr_reader :document
+    attr_reader :header, :navigation, :footer, :document, :uri
 
     def initialize(url)
       @uri = URI.parse(url)
       @document = Nokogiri::HTML(
-        open(url, "Accept-Language" => "en-US")
+        open(url, 'Accept-Language' => 'en-US')
       )
 
       @elements = @document.search('div', 'main', 'footer', 'nav').collect { |el| HtmlElement.new(el) }
@@ -22,37 +18,39 @@ module HtmlAnalyzer
     end
 
     def self.modify(url)
-      page = self.new(url)
+      page = new(url)
 
       navigation = page.document.search_navigation
-                                .reject {|e| e.attributes['class'].value.include? 'footer' if e.attributes['class']}
-                                .reject {|e| e.attributes['class'].value.include? 'shifter' if e.attributes['class']}
-                                .sort_by { |e| e.ancestors.size}
+                       .reject { |e| e.attributes['class'].value.include? 'footer' if e.attributes['class'] }
+                       .reject { |e| e.attributes['class'].value.include? 'shifter' if e.attributes['class'] }
+                       .sort_by { |e| e.ancestors.size }
       navigation.first.remove if navigation.any?
 
       header = page.document.css('header', "[role='banner']")
-                            .reject {|e| e.attributes['class'].value.include? 'section' if e.attributes['class']}
-                            .sort_by { |e| e.ancestors.size}
+                   .reject { |e| e.attributes['class'].value.include? 'section' if e.attributes['class'] }
+                   .sort_by { |e| e.ancestors.size }
 
-      header.first.ancestors.each { |el|
-        next if !el.element?
+      header.first.ancestors.each do |el|
+        next unless el.element?
 
         if el.attributes['class'] && el.attributes['class'].value.downcase.include?('nav')
           el.remove
           break
         end
-      }
+      end
 
       header.first.remove if header.any?
 
       footer = page.document.search_footer.sort_by { |e| e.ancestors.size }
       footer.first.remove if footer.any?
 
+      page.fix_relative_urls
+
       page.document.to_html
     end
 
     def self.process(url)
-      self.new(url)
+      new(url)
     end
 
     def footer?
@@ -72,18 +70,46 @@ module HtmlAnalyzer
     end
 
     def navigation_in_header?
-      persist = self.header? && self.navigation? && self.header.navigation?
+      persist = header? && navigation? && header.navigation?
 
       if persist
-        persist = persist && self.header.navigations.select { |nav|
-          self.navigation.get_model == nav.get_model
-        }.any?
+        persist &&= header.navigations.select do |nav|
+          navigation.get_model == nav.get_model
+        end.any?
       end
 
       persist
     end
 
+    def fix_relative_urls
+      @document.search('//link/@href').each do |link|
+        uri = URI.parse(link.value)
+        next unless uri.relative?
+        uri.scheme = @uri.scheme
+        uri.host = @uri.host
+        link.value = uri.to_s
+      end
+
+      tags = {
+        'img'    => 'src',
+        'script' => 'src',
+        'a'      => 'href'
+      }
+      @document.search(tags.keys.join(',')).each do |node|
+        url_param = tags[node.name]
+
+        src = node[url_param]
+        next if src.nil? || src.empty?
+        uri = URI.parse(src.strip)
+        next unless uri.relative?
+        uri.scheme = @uri.scheme
+        uri.host = @uri.host
+        node[url_param] = uri.to_s
+      end
+    end
+
     private
+
     def process_header
       elements = @document.css('header', "[role='banner']")
       @header = HtmlHeader.new(elements.first) if elements.any?
@@ -95,9 +121,9 @@ module HtmlAnalyzer
       # Also we reject navs with shifter class because this is injected by jquery mobile nav.
       # We do not want to be confused by duplicated navs.
       elements = @document.search_navigation
-                          .reject {|e| e.attributes['class'].value.include? 'footer' if e.attributes['class']}
-                          .reject {|e| e.attributes['class'].value.include? 'shifter' if e.attributes['class']}
-                          .sort_by { |e| e.ancestors.size}
+                          .reject { |e| e.attributes['class'].value.include? 'footer' if e.attributes['class'] }
+                          .reject { |e| e.attributes['class'].value.include? 'shifter' if e.attributes['class'] }
+                          .sort_by { |e| e.ancestors.size }
 
       @navigation = HtmlNavigation.new(elements.first) if elements.any?
     end
@@ -108,7 +134,6 @@ module HtmlAnalyzer
     end
 
     def strip_page
-
       for_removal = [
         'article', 'aside', 'audio',
         'blockquote', 'br',
@@ -117,12 +142,12 @@ module HtmlAnalyzer
         'picture', 'textarea', 'script', 'noscript', 'img', 'p', 'table'
       ]
 
-      @document.search(*for_removal).each { |node| node.remove }
+      @document.search(*for_removal).each(&:remove)
 
-      directory_name = "tmp"
-      Dir.mkdir(directory_name) unless File.exists?(directory_name)
+      directory_name = 'tmp'
+      Dir.mkdir(directory_name) unless File.exist?(directory_name)
 
-      File.open("#{directory_name}/#{name}.html", "w") do |f|
+      File.open("#{directory_name}/#{name}.html", 'w') do |f|
         f.write(@document.to_html)
       end
     end
