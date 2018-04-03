@@ -30,16 +30,18 @@ module HtmlAnalyzer
                    .reject { |e| e.attributes['class'].value.include? 'section' if e.attributes['class'] }
                    .sort_by { |e| e.ancestors.size }
 
-      header.first.ancestors.each do |el|
-        next unless el.element?
+      if header.any?
+        header.first.ancestors.each do |el|
+          next unless el.element?
 
-        if el.attributes['class'] && el.attributes['class'].value.downcase.include?('nav')
-          el.remove
-          break
+          if el.attributes['class'] && el.attributes['class'].value.downcase.include?('nav')
+            el.remove
+            break
+          end
         end
-      end
 
-      header.first.remove if header.any?
+        header.first.remove
+      end
 
       footer = page.document.search_footer.sort_by { |e| e.ancestors.size }
       footer.first.remove if footer.any?
