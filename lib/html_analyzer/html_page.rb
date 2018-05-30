@@ -88,7 +88,11 @@ module HtmlAnalyzer
         # We don't want to fix custom schemes like mailto: fb: etc...
         next unless link.value.start_with? 'http'
 
-        uri = URI.parse(link.value)
+        begin
+          uri = URI.parse(link.value)
+        rescue StandardError
+          next
+        end
 
         # Absolute paths are okay, so we skip them...
         next unless uri.relative?
@@ -112,7 +116,11 @@ module HtmlAnalyzer
         # We don't want to fix custom schemes like mailto: fb: etc...
         next unless src.start_with? 'http'
 
-        uri = URI.parse(src.strip)
+        begin
+          uri = URI.parse(src.strip)
+        rescue StandardError
+          next
+        end
 
         # Absolute paths are okay, so we skip them...
         next unless uri.relative?
