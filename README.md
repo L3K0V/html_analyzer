@@ -20,6 +20,13 @@ Or install it yourself as:
 
 ## Usage
 
+### Analyse html
+Analysing HTML provides information about the structure of the webpage.
+For example you can obtain if page contains header, footer of has navigation.
+You can extract links from these components if exists.
+
+In order to check some page if contains header, you can:
+
 ```ruby
 page = HtmlAnalyzer.analyze('https://github.com/')
 
@@ -28,18 +35,33 @@ page.header?
 page.header.probability
 => 0.25
 
+# You can check if header contains a navigation
+
 page.header.navigation?
 => true
+
+
+# Also there is way to determine if page have a footer
 
 page.footer?
 => true
 page.footer.probability
 => 0.4
 
+# Checking if there is a navigation, presume this will find the main navigation
+
 page.navigation?
 => true
 page.navigation.probability
 => 0.6
+```
+
+### Modify html
+Currently the gem support a way to return a modified version of the webpage HTML
+*excluding* the footer, header and the navigation.
+
+```ruby
+HtmlAnalyzer.modify('https://github.com/')
 ```
 
 ## Development

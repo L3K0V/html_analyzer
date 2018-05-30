@@ -85,7 +85,12 @@ module HtmlAnalyzer
 
     def fix_relative_urls
       @document.search('//link/@href').each do |link|
+        # We don't want to fix custom schemes like mailto: fb: etc...
+        next unless link.value.start_with? 'http'
+
         uri = URI.parse(link.value)
+
+        # Absolute paths are okay, so we skip them...
         next unless uri.relative?
         uri.scheme = @uri.scheme
         uri.host = @uri.host
@@ -97,12 +102,19 @@ module HtmlAnalyzer
         'script' => 'src',
         'a'      => 'href'
       }
+
       @document.search(tags.keys.join(',')).each do |node|
         url_param = tags[node.name]
 
         src = node[url_param]
+
         next if src.nil? || src.empty?
+        # We don't want to fix custom schemes like mailto: fb: etc...
+        next unless src.start_with? 'http'
+
         uri = URI.parse(src.strip)
+
+        # Absolute paths are okay, so we skip them...
         next unless uri.relative?
         uri.scheme = @uri.scheme
         uri.host = @uri.host
