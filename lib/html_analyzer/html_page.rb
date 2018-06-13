@@ -2,10 +2,10 @@ module HtmlAnalyzer
   class HtmlPage
     attr_reader :header, :navigation, :footer, :document, :uri
 
-    def initialize(url)
+    def initialize(url, user_agent = HtmlAnalyzer::PHONE_USER_AGENT)
       @uri = URI.parse(url)
       @document = Nokogiri::HTML(
-        open(url, 'Accept-Language' => 'en-US')
+        open(url, 'Accept-Language' => 'en-US', 'User-Agent' => user_agent)
       )
 
       @elements = @document.search('div', 'main', 'footer', 'nav').collect { |el| HtmlElement.new(el) }
@@ -17,8 +17,8 @@ module HtmlAnalyzer
       process_footer
     end
 
-    def self.modify(url)
-      page = new(url)
+    def self.modify(url, user_agent)
+      page = new(url, user_agent)
 
       navigation = page.document.search_navigation
                        .reject { |e| e.attributes['class'].value.include? 'footer' if e.attributes['class'] }
@@ -51,8 +51,8 @@ module HtmlAnalyzer
       page.document.to_html
     end
 
-    def self.process(url)
-      new(url)
+    def self.process(url, user_agent)
+      new(url, user_agent)
     end
 
     def footer?
