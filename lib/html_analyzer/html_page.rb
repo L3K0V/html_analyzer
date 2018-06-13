@@ -46,7 +46,7 @@ module HtmlAnalyzer
       footer = page.document.search_footer.sort_by { |e| e.ancestors.size }
       footer.first.remove if footer.any?
 
-      page.fix_relative_urls
+      # page.fix_relative_urls
 
       page.document.to_html
     end
