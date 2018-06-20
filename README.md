@@ -1,6 +1,6 @@
 # HtmlAnalyzer
 
-[https://www.w3.org/TR/wai-aria-1.1/](https://www.w3.org/TR/wai-aria-1.1/)
+This gem provides a simple way to identify elements on a web page such a header, navigation and footer also modifying webpages on the fly.
 
 ## Installation
 
@@ -40,7 +40,6 @@ page.header.probability
 page.header.navigation?
 => true
 
-
 # Also there is way to determine if page have a footer
 
 page.footer?
@@ -56,12 +55,38 @@ page.navigation.probability
 => 0.6
 ```
 
+You can get the element if exist by calling
+
+```ruby
+page.header
+
+# or the footer
+
+page.footer
+
+# or the navigation
+
+page.navigation
+```
+
 ### Modify html
 Currently the gem support a way to return a modified version of the webpage HTML
 *excluding* the footer, header and the navigation.
 
 ```ruby
 HtmlAnalyzer.modify('https://github.com/')
+```
+
+#### Post-processing
+
+Modify method provide way to post-process the document before return of the HTML of the page.
+You can access and modify the document passing a block and do whatever you want as a post process.
+
+```ruby
+page = HtmlAnalyzer.modify('http://mobil.mopo.de/', user_agent = HtmlAnalyzer::PHONE_USER_AGENT) do |document|
+  content = document.search("//div[@class='offcanvas-pagecontent']").first
+  content['style'] = 'margin-left: 0%'
+end
 ```
 
 ## Development
