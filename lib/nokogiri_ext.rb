@@ -1,34 +1,34 @@
 module Nokogiri
-
   PATTERNS = {
 
-    :header => [
-        'header', "[role='banner']"
+    header: [
+      'header', "[role='banner']",
+      '//div[contains(@class, "header")]', '//div[contains(@id, "header")]'
     ],
 
-    :footer => [
+    footer: [
       'footer', "[role='contentinfo']",
-      '//div[starts-with(@class, "footer")]', '//div[starts-with(@id, "footer")]'
+      '//div[contains(@class, "footer")]', '//div[contains(@id, "footer")]'
     ],
 
-    :navigation => [
+    navigation: [
       'nav', "[role='navigation']",
-      '//div[starts-with(@class, "nav")]', '//div[starts-with(@id, "nav")]',
-      '//div[starts-with(@class, "navigation")]', '//div[starts-with(@id, "navigation")]'
+      '//div[contains(@class, "nav")]', '//div[contains(@id, "nav")]',
+      '//div[contains(@class, "navigation")]', '//div[contains(@id, "navigation")]'
     ]
-  }
+  }.freeze
 
   module Regionable
     def search_header
-      self.search(*PATTERNS[:header])
+      search(*PATTERNS[:header])
     end
 
     def search_navigation
-      self.search(*PATTERNS[:navigation])
+      search(*PATTERNS[:navigation])
     end
 
     def search_footer
-      self.search(*PATTERNS[:footer])
+      search(*PATTERNS[:footer])
     end
   end
 

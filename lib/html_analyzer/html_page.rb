@@ -1,6 +1,6 @@
 module HtmlAnalyzer
   class HtmlPage
-    attr_reader :header, :navigation, :footer, :document, :uri
+    attr_reader :header, :navigation, :footer, :document, :uri, :is_mobile
 
     def initialize(url, user_agent = HtmlAnalyzer::PHONE_USER_AGENT)
       @uri = URI.parse(url)
@@ -8,6 +8,7 @@ module HtmlAnalyzer
         open(url, 'Accept-Language' => 'en-US', 'User-Agent' => user_agent)
       )
 
+      @is_mobile = user_agent == HtmlAnalyzer::PHONE_USER_AGENT
       @elements = @document.search('div', 'main', 'footer', 'nav').collect { |el| HtmlElement.new(el) }
 
       # strip_page
@@ -26,7 +27,7 @@ module HtmlAnalyzer
                        .sort_by { |e| e.ancestors.size }
       navigation.first.remove if navigation.any?
 
-      header = page.document.css('header', "[role='banner']")
+      header = page.document.search_header
                    .reject { |e| e.attributes['class'].value.include? 'section' if e.attributes['class'] }
                    .sort_by { |e| e.ancestors.size }
 
@@ -53,6 +54,7 @@ module HtmlAnalyzer
 
     def self.process(url, user_agent)
       new(url, user_agent)
+      "#{url} [mobile: #{user_agent == HtmlAnalyzer::PHONE_USER_AGENT}]"
     end
 
     def footer?
@@ -133,7 +135,7 @@ module HtmlAnalyzer
     private
 
     def process_header
-      elements = @document.css('header', "[role='banner']")
+      elements = @document.search_header.sort_by { |e| e.ancestors.size }
       @header = HtmlHeader.new(elements.first) if elements.any?
     end
 
