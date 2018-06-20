@@ -27,34 +27,12 @@ module HtmlAnalyzer
         begin
           log "Handling", url.inspect
 
-          page = HtmlPage.process(url)
+          page = HtmlPage.process(url, HtmlAnalyzer::DESKTOP_USER_AGENT)
+          data = extract_data(url, page)
+          self.record data
 
-          data = {
-            "url" => url,
-            "elements" => [
-              {
-                "element" => page.navigation&.get_model,
-                "probability" => page.navigation&.get_probability
-              },
-              {
-                "element" => page.header&.get_model,
-                "probability" => page.header&.get_probability
-              },
-              {
-                "element" => page.footer&.get_model,
-                "probability" => page.footer&.get_probability
-              }
-            ]
-          }
-
-          page.document.search('div', 'main', 'footer', 'nav').each do |node|
-            element = HtmlElement.new(node)
-            data["elements"].push({
-                "element" => element.get_model,
-                "probability" => element.get_probability
-            })
-          end
-
+          page = HtmlPage.process(url, HtmlAnalyzer::PHONE_USER_AGENT)
+          data = extract_data(url, page)
           self.record data
 
           if block_given? && @results.length > i
@@ -83,6 +61,36 @@ module HtmlAnalyzer
     private
     def log(label, info)
       warn "%-10s: %s" % [label, info]
+    end
+
+    def extract_data(url, page)
+      data = {
+        "url" => url,
+        "elements" => [
+          {
+            "element" => page.navigation&.get_model,
+            "probability" => page.navigation&.get_probability
+          },
+          {
+            "element" => page.header&.get_model,
+            "probability" => page.header&.get_probability
+          },
+          {
+            "element" => page.footer&.get_model,
+            "probability" => page.footer&.get_probability
+          }
+        ]
+      }
+
+      page.document.search('div', 'main', 'footer', 'nav').each do |node|
+        element = HtmlElement.new(node)
+        data["elements"].push({
+            "element" => element.get_model,
+            "probability" => element.get_probability
+        })
+      end
+
+      data
     end
   end
 end

@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 require 'csv'
-require "bundler/setup"
-require "html_analyzer"
+require 'bundler/setup'
+require 'html_analyzer'
 
 gather = HtmlAnalyzer.gather
 gather.enqueue 'https://www.culturata.com/'
@@ -19,22 +19,21 @@ gather.enqueue 'http://kolibriframework.io/'
 gather.enqueue 'https://www.microsoft.com'
 gather.enqueue 'https://squareup.com'
 gather.enqueue 'https://www.apple.com/'
-gather.enqueue 'https://www.reddit.com/'
 gather.enqueue 'https://www.bing.com/'
 gather.enqueue 'https://www.aliexpress.com/'
 gather.enqueue 'https://www.nzz.ch/'
+gather.enqueue 'https://www.hrtoday.ch/'
+gather.enqueue 'https://www.mopo.de/'
+gather.enqueue 'https://mobil.mopo.de/'
+gather.enqueue 'https://www.telezueri.ch/'
 
-Dir.chdir(".") do
-  CSV.open("./linear-regression-input.csv", "wb") do |csv|
+Dir.chdir('.') do
+  CSV.open('./linear-regression-input.csv', 'wb') do |csv|
+    csv << %w[url tag class id role home depth links links_by_depth probability]
 
-    csv << ['url', 'tag', 'class', 'id', 'role', 'depth', 'links', 'links_by_depth', 'probability']
-
-    gather.results.each { |r|
-      r['elements'].each { |e|
-        
-        if e['element'].nil? || e['element'].empty?
-          next
-        end
+    gather.results.each do |r|
+      r['elements'].each do |e|
+        next if e['element'].nil? || e['element'].empty?
 
         data = []
         data << r['url']
@@ -43,7 +42,7 @@ Dir.chdir(".") do
 
         csv << data
         csv.flush
-      }
-    }
+      end
+    end
   end
 end

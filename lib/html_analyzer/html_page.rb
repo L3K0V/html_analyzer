@@ -1,17 +1,18 @@
 module HtmlAnalyzer
   class HtmlPage
-    attr_reader :header, :navigation, :footer, :document, :uri, :is_mobile
+    attr_reader :header, :navigation, :footer, :document, :uri, :user_agent
 
-    def initialize(url, user_agent = HtmlAnalyzer::PHONE_USER_AGENT)
+    def initialize(url, user_agent = HtmlAnalyzer::PHONE_USER_AGENT, strip = true)
       @uri = URI.parse(url)
       @document = Nokogiri::HTML(
         open(url, 'Accept-Language' => 'en-US', 'User-Agent' => user_agent)
       )
 
-      @is_mobile = user_agent == HtmlAnalyzer::PHONE_USER_AGENT
+      @is_mobile =
+        @user_agent = user_agent
       @elements = @document.search('div', 'main', 'footer', 'nav').collect { |el| HtmlElement.new(el) }
 
-      # strip_page
+      strip_page if strip
 
       process_header
       process_navigation
@@ -19,7 +20,7 @@ module HtmlAnalyzer
     end
 
     def self.modify(url, user_agent)
-      page = new(url, user_agent)
+      page = new(url, user_agent, false)
 
       navigation = page.document.search_navigation
                        .reject { |e| e.attributes['class'].value.include? 'footer' if e.attributes['class'] }
@@ -56,7 +57,6 @@ module HtmlAnalyzer
 
     def self.process(url, user_agent)
       new(url, user_agent)
-      "#{url} [mobile: #{user_agent == HtmlAnalyzer::PHONE_USER_AGENT}]"
     end
 
     def footer?
@@ -85,6 +85,10 @@ module HtmlAnalyzer
       end
 
       persist
+    end
+
+    def is_mobile?
+      user_agent == HtmlAnalyzer::PHONE_USER_AGENT
     end
 
     def fix_relative_urls

@@ -1,7 +1,7 @@
 module HtmlAnalyzer
-  module ElementProbability
-
+  module NavigationProbability
     public
+
     def is_element?
       calc_probability >= 0.5
     end
@@ -16,16 +16,22 @@ module HtmlAnalyzer
 
     private
 
-    NAV_LITERALS = ["nav", "navigation"]
-    OTHER_LITERALS = ["menu", "main"]
+    NAV_LITERALS = %w[nav navigation].freeze
+    OTHER_LITERALS = %w[menu main].freeze
 
     def calc_probability
       coef = 0.0
       coef += 0.35 if @tag == 'nav'
       coef += 0.15 if @tag == 'div'
       coef += 0.75 if @role == 'navigation'
-      coef += 0.10 if self.links?
-      coef += 0.15 if self.links? && self.links.size / 2 <= links_by_depth.first[1]
+      coef += 0.10 if links?
+      coef += 0.15 if links? && links.size / 2 <= links_by_depth.first[1]
+
+      home = links.select do |link|
+        link.url == '/'
+      end
+
+      coef += 0.35 if home.any?
 
       coef += 0.20 if @id && @id.downcase.match(Regexp.union(NAV_LITERALS))
       coef += 0.10 if @id && @id.downcase.match(Regexp.union(OTHER_LITERALS))
@@ -53,22 +59,22 @@ module HtmlAnalyzer
     def calc_model
       tag_c = 0
 
-      case @tag
-      when "nav"
-        tag_c = 3
-      when "div"
-        tag_c = 2
-      when "header"
-        tag_c = 1
-      when "footer"
-        tag_c = -1
-      else
-        tag_c = 0
-      end
+      tag_c = case @tag
+              when 'nav'
+                3
+              when 'div'
+                2
+              when 'header'
+                1
+              when 'footer'
+                -1
+              else
+                0
+              end
 
-      nav_literals = ["nav", "navigation"]
-      other_literals = ["menu", "main"]
-      footer_literals = ["bottom", "footer"]
+      nav_literals = %w[nav navigation]
+      other_literals = %w[menu main appbar topbar]
+      footer_literals = %w[bottom footer]
       clss_c = 0
 
       if @classes
@@ -91,11 +97,11 @@ module HtmlAnalyzer
       end
 
       role_c = 0
-      role_c = @role == "navigation" ? 3 : 0 if @role
-      role_c = @role == "menu" ? 2 : role_c if @role
-      role_c = @role == "menubar" ? 2 : role_c if @role
-      role_c = @role == "toolbar" ? 1 : role_c if @role
-      role_c = @role == "contentinfo" ? -1 : role_c if @role
+      role_c = @role == 'navigation' ? 3 : 0 if @role
+      role_c = @role == 'menu' ? 2 : role_c if @role
+      role_c = @role == 'menubar' ? 2 : role_c if @role
+      role_c = @role == 'toolbar' ? 1 : role_c if @role
+      role_c = @role == 'contentinfo' ? -1 : role_c if @role
 
       id_c = 0
       id_c = @id.downcase.match(Regexp.union(NAV_LITERALS)) ? 2 : 0 if @id
@@ -105,11 +111,14 @@ module HtmlAnalyzer
       links_s = 0
       links_depth = 0
 
+      contains_link_to_home = links.select do |link|
+        link.url == '/'
+      end
+
       links_s = 1 if links?
       links_depth = 1 if links? && links.size / 2 <= links_by_depth.first[1]
 
-      "#{tag_c},#{clss_c},#{id_c},#{role_c},#{depth},#{links_s},#{links_depth}"
+      "#{tag_c},#{clss_c},#{id_c},#{role_c},#{contains_link_to_home.any? ? 1 : 0},#{depth},#{links_s},#{links_depth}"
     end
-
   end
 end

@@ -3,7 +3,9 @@ module Nokogiri
 
     header: [
       'header', "[role='banner']",
-      '//div[contains(@class, "header")]', '//div[contains(@id, "header")]'
+      '//div[contains(@class, "header")]', '//div[contains(@id, "header")]',
+      '//div[contains(@class, "topbar")]', '//div[contains(@id, "topbar")]',
+      '//div[contains(@class, "appbar")]', '//div[contains(@id, "appbar")]'
     ],
 
     footer: [
@@ -14,7 +16,8 @@ module Nokogiri
     navigation: [
       'nav', "[role='navigation']",
       '//div[contains(@class, "nav")]', '//div[contains(@id, "nav")]',
-      '//div[contains(@class, "navigation")]', '//div[contains(@id, "navigation")]'
+      '//div[contains(@class, "navigation")]', '//div[contains(@id, "navigation")]',
+      '//div[contains(@class, "navbar")]', '//div[contains(@id, "navbar")]'
     ]
   }.freeze
 

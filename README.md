@@ -32,26 +32,32 @@ page = HtmlAnalyzer.analyze('https://github.com/')
 
 page.header?
 => true
-page.header.probability
-=> 0.25
+page.header.get_probability
+=> 0.4
 
 # You can check if header contains a navigation
 
 page.header.navigation?
 => true
 
+page.navigation_in_header?
+=> true
+
+# The difference between two methods are that navigation_in_header will return true
+# if main navigation is in the header. Header can contains some context navigation.
+
 # Also there is way to determine if page have a footer
 
 page.footer?
 => true
-page.footer.probability
+page.footer.get_probability
 => 0.4
 
 # Checking if there is a navigation, presume this will find the main navigation
 
 page.navigation?
 => true
-page.navigation.probability
+page.navigation.get_probability
 => 0.6
 ```
 
@@ -59,15 +65,13 @@ You can get the element if exist by calling
 
 ```ruby
 page.header
-
 # or the footer
-
 page.footer
-
 # or the navigation
-
 page.navigation
 ```
+
+> Notice that probability is the probability element to be a main navigation element.
 
 ### Modify html
 Currently the gem support a way to return a modified version of the webpage HTML
@@ -87,6 +91,20 @@ page = HtmlAnalyzer.modify('http://mobil.mopo.de/', user_agent = HtmlAnalyzer::P
   content = document.search("//div[@class='offcanvas-pagecontent']").first
   content['style'] = 'margin-left: 0%'
 end
+```
+
+### User agent
+
+User can specify how the analyzer tool to behave - as desktop or phone. This can be passed to the `HtmlAnalyzer` methods as a second argument
+
+```ruby
+# by default HtmlAnalyzer will analyze as dekstop
+page = HtmlAnalyzer.analyze('https://github.com/', HtmlAnalyzer::DESKTOP_USER_AGENT)
+html = HtmlAnalyzer.modify('https://github.com/', HtmlAnalyzer::DESKTOP_USER_AGENT)
+
+# or analyze/process as phone
+page = HtmlAnalyzer.analyze('https://github.com/', HtmlAnalyzer::PHONE_USER_AGENT)
+html = HtmlAnalyzer.modify('https://github.com/', HtmlAnalyzer::PHONE_USER_AGENT)
 ```
 
 ## Development

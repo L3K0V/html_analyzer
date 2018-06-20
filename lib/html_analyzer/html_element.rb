@@ -1,8 +1,7 @@
 module HtmlAnalyzer
-
   class HtmlElement
-    require_relative "element_probability"
-    include HtmlAnalyzer::ElementProbability
+    require_relative 'navigation_probability'
+    include HtmlAnalyzer::NavigationProbability
 
     attr_reader :tag, :classes, :id, :role, :depth, :links
 
@@ -28,7 +27,7 @@ module HtmlAnalyzer
     end
 
     def links_by_depth
-      @links.each_with_object(Hash.new(0)) { |link, counts| counts[link.depth] += 1 }.sort_by {|k, v| v}.reverse
+      @links.each_with_object(Hash.new(0)) { |link, counts| counts[link.depth] += 1 }.sort_by { |_k, v| v }.reverse
     end
 
     def to_s
@@ -36,7 +35,8 @@ module HtmlAnalyzer
     end
 
     protected
-    def extract_links element
+
+    def extract_links(element)
       element.search('a')
              .reject { |e| e.text.strip.empty? }
              .collect { |e| HtmlAnalyzer::HtmlLink.new(e) }
