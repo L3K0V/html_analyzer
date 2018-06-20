@@ -19,8 +19,8 @@ module HtmlAnalyzer
     HtmlPage.process(url, user_agent)
   end
 
-  def self.modify(url, user_agent = DESKTOP_USER_AGENT)
-    HtmlPage.modify(url, user_agent)
+  def self.modify(url, user_agent = DESKTOP_USER_AGENT, &block)
+    HtmlPage.modify(url, user_agent, &block)
   end
 
   def self.gather

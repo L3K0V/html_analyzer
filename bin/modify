@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "html_analyzer"
+
+page = HtmlAnalyzer.modify('http://mobil.mopo.de/', user_agent = HtmlAnalyzer::PHONE_USER_AGENT) do |document|
+  content = document.search("//div[@class='offcanvas-pagecontent']").first
+  content['style'] = 'margin-left: 0%'
+end
+
+directory_name = 'tmp'
+Dir.mkdir(directory_name) unless File.exist?(directory_name)
+
+File.open("#{directory_name}/mopo.html", 'w') do |f|
+  f.write(page)
+end

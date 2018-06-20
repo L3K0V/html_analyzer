@@ -49,6 +49,8 @@ module HtmlAnalyzer
 
       page.fix_relative_urls
 
+      yield page.document if block_given?
+
       page.document.to_html
     end
 
