@@ -112,7 +112,8 @@ module HtmlAnalyzer
       tags = {
         'img'    => 'src',
         'script' => 'src',
-        'a'      => 'href'
+        'a'      => 'href',
+        'link'   => 'href'
       }
 
       @document.search(tags.keys.join(',')).each do |node|
@@ -121,8 +122,9 @@ module HtmlAnalyzer
         src = node[url_param]
 
         next if src.nil? || src.empty?
+
         # We don't want to fix custom schemes like mailto: fb: etc...
-        next unless src.start_with? 'http'
+        next unless src.start_with?('http', '/')
 
         begin
           uri = URI.parse(src.strip)
