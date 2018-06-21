@@ -1,11 +1,14 @@
 #!/usr/bin/env ruby
 
-require "bundler/setup"
-require "html_analyzer"
+require 'bundler/setup'
+require 'html_analyzer'
 
-page = HtmlAnalyzer.modify('http://mobil.mopo.de/', user_agent = HtmlAnalyzer::PHONE_USER_AGENT) do |document|
+page = HtmlAnalyzer.modify('https://mobil.mopo.de/', user_agent = HtmlAnalyzer::PHONE_USER_AGENT) do |document|
   content = document.search("//div[@class='offcanvas-pagecontent']").first
-  content['style'] = 'margin-left: 0%'
+  content['style'] = 'margin-left: 0%' if content
+
+  header = document.search("//header[@class='page-header' and @role='banner']").first
+  header.remove if header
 end
 
 directory_name = 'tmp'
