@@ -14,7 +14,7 @@ module Nokogiri
     ],
 
     navigation: [
-      'nav', "[role='navigation']",
+      'amp-sidebar', 'nav', "[role='navigation']",
       '//div[contains(@class, "nav")]', '//div[contains(@id, "nav")]',
       '//div[contains(@class, "navigation")]', '//div[contains(@id, "navigation")]',
       '//div[contains(@class, "navbar")]', '//div[contains(@id, "navbar")]'
