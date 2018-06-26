@@ -2,10 +2,12 @@ module HtmlAnalyzer
   class HtmlPage
     attr_reader :header, :navigation, :footer, :document, :uri, :user_agent
 
+    require "open_uri_redirections"
+
     def initialize(url, user_agent = HtmlAnalyzer::PHONE_USER_AGENT, strip = true)
       @uri = URI.parse(url)
       @document = Nokogiri::HTML(
-        open(url, 'Accept-Language' => 'en-US', 'User-Agent' => user_agent)
+        open(url, :allow_redirections => :all, 'Accept-Language' => 'en-US', 'User-Agent' => user_agent)
       )
 
       @is_mobile =
