@@ -29,7 +29,7 @@ gather.enqueue 'https://www.telezueri.ch/'
 
 Dir.chdir('.') do
   CSV.open('./linear-regression-input.csv', 'wb') do |csv|
-    csv << %w[url tag class id role home depth links links_by_depth probability]
+    csv << %w[url tag class class_count id role home depth links links_by_depth probability]
 
     gather.results.each do |r|
       r['elements'].each do |e|

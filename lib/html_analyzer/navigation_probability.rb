@@ -96,6 +96,9 @@ module HtmlAnalyzer
         end
       end
 
+      clss_count = 0
+      clss_count = @classes.length if @classes
+
       role_c = 0
       role_c = @role == 'navigation' ? 3 : 0 if @role
       role_c = @role == 'menu' ? 2 : role_c if @role
@@ -118,7 +121,7 @@ module HtmlAnalyzer
       links_s = 1 if links?
       links_depth = 1 if links? && links.size / 2 <= links_by_depth.first[1]
 
-      "#{tag_c},#{clss_c},#{id_c},#{role_c},#{contains_link_to_home.any? ? 1 : 0},#{depth},#{links_s},#{links_depth}"
+      "#{tag_c},#{clss_c},#{clss_count},#{id_c},#{role_c},#{contains_link_to_home.any? ? 1 : 0},#{depth},#{links_s},#{links_depth}"
     end
   end
 end
